@@ -10,48 +10,42 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Lab 2 - Login Page',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
       ),
-      // We removed "const" here because the home page state is now fully dynamic
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const LoginPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  // REQUIREMENT 1: Use 'var' instead of 'int' or 'double', initialized to 0.0
-  var _counter = 0.0;
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
-  // REQUIREMENT 2: Declare myFontSize and initialize to 30.0
-  double myFontSize = 30.0;
+  // Starting image
+  String _imageSource = 'images/question-mark.png';
+  String _imageDescription = 'A question mark indicating you need to login.';
 
-  // REQUIREMENT 3: Declare a private _myFontStyle variable using a TextStyle object
-  // 'late' allows us to safely reference myFontSize during initialization
-  late TextStyle _myFontStyle = TextStyle(fontSize: myFontSize);
+  void _handleLogin() {
+    String enteredPassword = _passwordController.text;
 
-  // REQUIREMENT 5: Create a private function _setNewValue() to update font size & text properties
-  void _setNewValue(double newValue) {
     setState(() {
-      _counter = newValue;      // Track slider value on the counter
-      myFontSize = newValue;    // Update our font size tracker
-      _myFontStyle = TextStyle(fontSize: myFontSize); // Generate updated text style
-    });
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
+      if (enteredPassword == 'ASDF') {
+        _imageSource = 'images/idea.png';
+        _imageDescription = 'A glowing light bulb indicating successful login.';
+      } else {
+        _imageSource = 'images/stop.png';
+        _imageDescription = 'A red stop sign indicating incorrect password.';
+      }
     });
   }
 
@@ -59,43 +53,67 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('CST2335 Login Lab'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // REQUIREMENT 4: Removed 'const' and applied _myFontStyle to both Text widgets
-            Text(
-              'You have pushed the button this many times:',
-              style: _myFontStyle,
-            ),
-            Text(
-              '$_counter',
-              style: _myFontStyle,
+            const SizedBox(height: 20),
+
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: TextField(
+                controller: _usernameController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Login name',
+                ),
+              ),
             ),
 
-            // Adding structural spacing between text elements and our control slider
-            const SizedBox(height: 50),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Password',
+                ),
+              ),
+            ),
 
-            // REQUIREMENT 5 (UI component): Slider layout to call the logic function on change
-            Slider(
-              min: 10.0,
-              max: 100.0,
-              value: myFontSize.clamp(10.0, 100.0), // Keeps value strictly inside safe layout boundaries
-              onChanged: (double value) {
-                _setNewValue(value);
-              },
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: ElevatedButton(
+                onPressed: _handleLogin,
+                child: const Text('Login'),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            Semantics(
+              label: _imageDescription,
+              child: Image.asset(
+                _imageSource,
+                width: 300,
+                height: 300,
+                fit: BoxFit.contain,
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
